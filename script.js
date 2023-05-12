@@ -1,68 +1,49 @@
-function calculateMinCost() {
-  // Get the input and validate it
-  const input = document.querySelector('#rope-lengths').value;
-  if (!input) {
-    alert('Please enter a valid input!');
-    return;
-  }
-  const ropeLengths = input.split(',').map(Number);
-  if (ropeLengths.some(isNaN)) {
-    alert('Please enter a valid input!');
-    return;
-  }
+const input = document.querySelector('input[type="text"]');
+const resultDiv = document.querySelector('#result');
 
-  // Connect the ropes with minimum length
-  const pq = new MinHeap(ropeLengths);
-  let totalCost = 0;
+input.addEventListener('change', () => {
+  const lengths = input.value;
+  const cost = minCostOfRopes(lengths);
+  resultDiv.textContent = cost;
+});
+function minCostOfRopes(lengths) {
+  // Convert the input string to an array of integers
+  const ropes = lengths.split(',').map(str => parseInt(str.trim()));
+  
+  // Initialize a priority queue with the lengths of the ropes
+  const pq = new PriorityQueue();
+  ropes.forEach(len => pq.enqueue(len));
+  
+  // Merge ropes until only one remains in the queue
+  let cost = 0;
   while (pq.size() > 1) {
-    const sum = pq.extractMin() + pq.extractMin();
-    totalCost += sum;
-    pq.insert(sum);
+    const len1 = pq.dequeue();
+    const len2 = pq.dequeue();
+    const mergedLen = len1 + len2;
+    cost += mergedLen;
+    pq.enqueue(mergedLen);
   }
-
-  // Print the minimum cost to the result div
-  const resultDiv = document.querySelector('#result');
-  resultDiv.innerHTML = `Minimum cost of connecting ropes: ${totalCost}`;
+  
+  // Return the total cost of merging the ropes
+  return cost;
 }
 
-class MinHeap {
-  constructor(arr) {
-    this.heap = [null];
-    for (const x of arr) {
-      this.insert(x);
-    }
+// A simple priority queue implementation using an array
+class PriorityQueue {
+  constructor() {
+    this.queue = [];
   }
-
-  insert(x) {
-    this.heap.push(x);
-    let i = this.heap.length - 1;
-    while (i > 1 && this.heap[i] < this.heap[Math.floor(i / 2)]) {
-      [this.heap[i], this.heap[Math.floor(i / 2)]] = [this.heap[Math.floor(i / 2)], this.heap[i]];
-      i = Math.floor(i / 2);
-    }
+  
+  enqueue(item) {
+    this.queue.push(item);
+    this.queue.sort((a, b) => b - a);
   }
-
-  extractMin() {
-    if (this.heap.length <= 1) {
-      return null;
-    }
-    const min = this.heap[1];
-    this.heap[1] = this.heap.pop();
-    let i = 1;
-    while (i * 2 < this.heap.length) {
-      const left = i * 2;
-      const right = i * 2 + 1;
-      const child = right < this.heap.length && this.heap[right] < this.heap[left] ? right : left;
-      if (this.heap[child] >= this.heap[i]) {
-        break;
-      }
-      [this.heap[i], this.heap[child]] = [this.heap[child], this.heap[i]];
-      i = child;
-    }
-    return min;
+  
+  dequeue() {
+    return this.queue.pop();
   }
-
+  
   size() {
-    return this.heap.length - 1;
+    return this.queue.length;
   }
 }
