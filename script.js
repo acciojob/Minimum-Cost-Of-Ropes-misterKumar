@@ -1,3 +1,11 @@
+const input = document.querySelector('input[type="text"]');
+const resultDiv = document.querySelector('#result');
+
+input.addEventListener('change', () => {
+  const lengths = input.value;
+  const cost = minCostOfRopes(lengths);
+  resultDiv.textContent = cost;
+});
 
 function minCostOfRopes(lengths) {
   // Convert the input string to an array of integers
