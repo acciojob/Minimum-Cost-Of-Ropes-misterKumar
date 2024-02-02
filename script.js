@@ -1,50 +1,32 @@
-const input = document.querySelector('input[type="text"]');
-const resultDiv = document.querySelector('#result');
+function calculateMinCost() {
+    // Fetching the input value and converting it into an array of integers
+    var inputText = document.getElementById("rope-lengths").value;
+    var ropeLengths = inputText.split(',').map(Number);
 
-input.addEventListener('change', () => {
-  const lengths = input.value;
-  const cost = minCostOfRopes(lengths);
-  resultDiv.textContent = cost;
-});
+    // Sorting the array of rope lengths in ascending order
+    ropeLengths.sort(function(a, b) {
+        return a - b;
+    });
 
-function minCostOfRopes(lengths) {
-  // Convert the input string to an array of integers
-  const ropes = lengths.split(',').map(str => parseInt(str.trim()));
-  
-  // Initialize a priority queue with the lengths of the ropes
-  const pq = new PriorityQueue();
-  ropes.forEach(len => pq.enqueue(len));
-  
-  // Merge ropes until only one remains in the queue
-  let cost = 0;
-  while (pq.size() > 1) {
-    const len1 = pq.dequeue();
-    const len2 = pq.dequeue();
-    const mergedLen = len1 + len2;
-    cost += mergedLen;
-    pq.enqueue(mergedLen);
-  }
-  
-  // Return the total cost of merging the ropes
-  return cost;
-}
+    var totalCost = 0;
 
-// A simple priority queue implementation using an array
-class PriorityQueue {
-  constructor() {
-    this.queue = [];
-  }
-  
-  enqueue(item) {
-    this.queue.push(item);
-    this.queue.sort((a, b) => b - a);
-  }
-  
-  dequeue() {
-    return this.queue.pop();
-  }
-  
-  size() {
-    return this.queue.length;
-  }
+    // Iterating through the sorted array and calculating the total cost
+    while (ropeLengths.length > 1) {
+        var min1 = ropeLengths.shift();
+        var min2 = ropeLengths.shift();
+
+        var currentCost = min1 + min2;
+
+        // Adding the current cost to the total cost and inserting the new rope length back into the array
+        totalCost += currentCost;
+        ropeLengths.push(currentCost);
+
+        // Re-sorting the array after adding the new rope length
+        ropeLengths.sort(function(a, b) {
+            return a - b;
+        });
+    }
+
+    // Displaying the result in the HTML div with id="result"
+    document.getElementById("result").innerHTML = "Minimum Cost: " + totalCost;
 }
